@@ -1,5 +1,6 @@
 # XBEE-nodes
 This is a part of my BSc thesis.
+![Image of my nodes](img/nodes.PNG)
 # What's this?
 The code reads an FSR sensor and interacts with XBEE S2 module to send data to the gateway.
 # What's FSR?
