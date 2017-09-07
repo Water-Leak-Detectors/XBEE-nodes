@@ -2,7 +2,7 @@
 This is a part of my BSc thesis.
 
 <p align="center">
-    <img src="img/nodes.PNG"></img>
+    <img src="img/nodes.PNG" height=640 width=640></img>
 </p>
 
 # What's this?
