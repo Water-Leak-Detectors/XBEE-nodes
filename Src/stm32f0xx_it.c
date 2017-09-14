@@ -40,8 +40,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_usart2_rx;
-extern DMA_HandleTypeDef hdma_usart2_tx;
 
 /******************************************************************************/
 /*            Cortex-M0 Processor Interruption and Exception Handlers         */ 
@@ -123,21 +121,6 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f0xx.s).                    */
 /******************************************************************************/
-
-/**
-* @brief This function handles DMA1 channel 4 and 5 interrupts.
-*/
-void DMA1_Channel4_5_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Channel4_5_IRQn 0 */
-
-  /* USER CODE END DMA1_Channel4_5_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_usart2_tx);
-  HAL_DMA_IRQHandler(&hdma_usart2_rx);
-  /* USER CODE BEGIN DMA1_Channel4_5_IRQn 1 */
-
-  /* USER CODE END DMA1_Channel4_5_IRQn 1 */
-}
 
 /* USER CODE BEGIN 1 */
 

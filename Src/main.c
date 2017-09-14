@@ -39,7 +39,6 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
 #include "adc.h"
-#include "dma.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -51,13 +50,15 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-uint8_t msg[9] = "Hello ST!";
+__IO uint16_t ConvValue = 0;
+uint8_t eol = '\n';
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
+void send_number12(UART_HandleTypeDef*, uint16_t, uint32_t);
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
@@ -91,12 +92,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_ADC_Init();
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
-	HAL_UART_Transmit_DMA(&huart2, msg, sizeof(msg));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,8 +105,13 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	HAL_GPIO_TogglePin(ON_SLEEP_GPIO_Port, ON_SLEEP_Pin);
-	HAL_Delay(1000);
+	HAL_ADC_Start(&hadc);
+	HAL_ADC_PollForConversion(&hadc, 200);
+	ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
+	HAL_ADC_Stop(&hadc);
+	send_number12(&huart2, ConvValue, 200);
+	HAL_UART_Transmit(&huart2, &eol, 1, 200);
+	HAL_Delay(25);
   }
   /* USER CODE END 3 */
 
@@ -123,12 +127,15 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSI14;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI14|RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI14State = RCC_HSI14_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
   RCC_OscInitStruct.HSI14CalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
@@ -138,11 +145,11 @@ void SystemClock_Config(void)
     */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -160,7 +167,27 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+/**
+  * @brief  This function converts integer to printable string
+	* @param  UARTx : pointer to UART handle typedef
+	*	@paran	num_value : integer value which is to be converted
+	* @param 	timout : timout value needed for sending over UART
+  * @retval None
+  */
+void send_number12(UART_HandleTypeDef* UARTx, uint16_t num_value, uint32_t timeout)
+{
+	uint8_t buffer[4] = "0000";
+	int i=0;
+	
+	do
+	{
+		buffer[3 - i++] = (uint8_t)(num_value % 10) + 48;
+		num_value /= 10;
+	}
+	while(num_value);
+	
+	HAL_UART_Transmit(UARTx, buffer, sizeof(buffer), timeout);
+}
 /* USER CODE END 4 */
 
 /**
@@ -174,6 +201,8 @@ void _Error_Handler(char * file, int line)
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
+		HAL_GPIO_TogglePin(ON_SLEEP_GPIO_Port, ON_SLEEP_Pin);
+		HAL_Delay(500);
   }
   /* USER CODE END Error_Handler_Debug */ 
 }
