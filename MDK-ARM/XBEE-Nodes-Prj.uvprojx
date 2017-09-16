@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F051x8</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;    ../Drivers/STM32F0xx_HAL_Driver/Inc;    ../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;    ../Drivers/CMSIS/Device/ST/STM32F0xx/Include;    ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;..\MDK-ARM</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -428,11 +428,6 @@
               <FileName>usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>XBEE.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\XBEE.h</FilePath>
             </File>
             <File>
               <FileName>XBEE.c</FileName>

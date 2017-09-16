@@ -43,7 +43,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "XBEE.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -52,6 +52,7 @@
 /* Private variables ---------------------------------------------------------*/
 __IO uint16_t ConvValue = 0;
 uint8_t eol = '\n';
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -188,6 +189,7 @@ void send_number12(UART_HandleTypeDef* UARTx, uint16_t num_value, uint32_t timeo
 	
 	HAL_UART_Transmit(UARTx, buffer, sizeof(buffer), timeout);
 }
+
 /* USER CODE END 4 */
 
 /**
