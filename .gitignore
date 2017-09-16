@@ -58,3 +58,4 @@ dkms.conf
 # Keil project temps
 *.uvoptx
 *.uvguix*
+*.TMP
