@@ -52,7 +52,9 @@
 /* Private variables ---------------------------------------------------------*/
 __IO uint16_t ConvValue = 0;
 uint8_t eol = '\n';
-
+transmit_frame frame;
+transmit_frame* frame_ptr;
+uint8_t data[2];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,6 +99,20 @@ int main(void)
   MX_USART2_UART_Init();
 
   /* USER CODE BEGIN 2 */
+	frame_ptr = &frame;
+	frame_ptr->frame_id = 0x01;
+	frame_ptr->addr64[0] = 0x00;
+	frame_ptr->addr64[1] = 0x13;
+	frame_ptr->addr64[2] = 0xA2;
+	frame_ptr->addr64[3] = 0x00;
+	frame_ptr->addr64[4] = 0x40;
+	frame_ptr->addr64[5] = 0x0A;
+	frame_ptr->addr64[6] = 0x01;
+	frame_ptr->addr64[7] = 0x27;
+	frame_ptr->addr16[0] = 0xFF;
+	frame_ptr->addr16[1] = 0xFE;
+	frame_ptr->brdcast_rad = 0x00;
+	frame_ptr->opt = 0x00;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,13 +122,15 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	HAL_ADC_Start(&hadc);
-	HAL_ADC_PollForConversion(&hadc, 200);
-	ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
-	HAL_ADC_Stop(&hadc);
-	send_number12(&huart2, ConvValue, 200);
-	HAL_UART_Transmit(&huart2, &eol, 1, 200);
-	HAL_Delay(25);
+		HAL_ADC_Start(&hadc);
+		HAL_ADC_PollForConversion(&hadc, 200);
+		ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
+		HAL_ADC_Stop(&hadc);
+		if(transmit_rq(frame_ptr, data, sizeof(data), &huart2) != HAL_OK)
+		{
+			Error_Handler();
+		}
+		HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 
