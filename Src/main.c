@@ -130,13 +130,13 @@ int main(void)
 		data[1] = ConvValue;
 		data[0] = ConvValue >> 8;
 		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_RESET);
-		HAL_Delay(2000);
+		HAL_Delay(500);
 		if(transmit_rq(frame_ptr, data, sizeof(data), &huart2) != HAL_OK)
 		{
 			Error_Handler();
 		}
 		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_SET);
-		HAL_Delay(10000);
+		HAL_Delay(8000);
   }
   /* USER CODE END 3 */
 
