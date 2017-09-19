@@ -51,7 +51,6 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 __IO uint16_t ConvValue = 0;
-uint8_t eol = '\n';
 transmit_frame frame;
 transmit_frame* frame_ptr;
 uint8_t data[2];
@@ -130,10 +129,13 @@ int main(void)
 		HAL_ADC_Stop(&hadc);
 		data[1] = ConvValue;
 		data[0] = ConvValue >> 8;
+		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_RESET);
+		HAL_Delay(2000);
 		if(transmit_rq(frame_ptr, data, sizeof(data), &huart2) != HAL_OK)
 		{
 			Error_Handler();
 		}
+		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_SET);
 		HAL_Delay(10000);
   }
   /* USER CODE END 3 */
