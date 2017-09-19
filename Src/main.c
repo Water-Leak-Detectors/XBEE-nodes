@@ -101,14 +101,16 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	frame_ptr = &frame;
 	frame_ptr->frame_id = 0x01;
+	//64 bit address
 	frame_ptr->addr64[0] = 0x00;
 	frame_ptr->addr64[1] = 0x13;
 	frame_ptr->addr64[2] = 0xA2;
 	frame_ptr->addr64[3] = 0x00;
-	frame_ptr->addr64[4] = 0x40;
-	frame_ptr->addr64[5] = 0x0A;
-	frame_ptr->addr64[6] = 0x01;
-	frame_ptr->addr64[7] = 0x27;
+	frame_ptr->addr64[4] = 0x41;
+	frame_ptr->addr64[5] = 0x47;
+	frame_ptr->addr64[6] = 0x2F;
+	frame_ptr->addr64[7] = 0xB8;
+	//16 bit address
 	frame_ptr->addr16[0] = 0xFF;
 	frame_ptr->addr16[1] = 0xFE;
 	frame_ptr->brdcast_rad = 0x00;
@@ -126,11 +128,13 @@ int main(void)
 		HAL_ADC_PollForConversion(&hadc, 200);
 		ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
 		HAL_ADC_Stop(&hadc);
+		data[1] = ConvValue;
+		data[0] = ConvValue >> 8;
 		if(transmit_rq(frame_ptr, data, sizeof(data), &huart2) != HAL_OK)
 		{
 			Error_Handler();
 		}
-		HAL_Delay(1000);
+		HAL_Delay(10000);
   }
   /* USER CODE END 3 */
 

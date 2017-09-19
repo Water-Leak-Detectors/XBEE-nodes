@@ -18,6 +18,7 @@ const uint8_t trans_stat = 0x8B;
   */	
 void calc_checksum(transmit_frame* frame, uint8_t* data, uint16_t data_size)
 {
+	frame->checksum = 0;
 	frame->checksum += frame->frame_type;
 	frame->checksum += frame->frame_id;
 	/* Add 64 bit address*/
