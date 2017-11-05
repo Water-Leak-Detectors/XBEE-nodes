@@ -50,17 +50,22 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
+#define filterWindowLength 30
 __IO uint16_t ConvValue = 0;
+uint16_t filteredValue;
 transmit_frame frame;
 transmit_frame* frame_ptr;
-uint8_t data[2];
+uint8_t data[6];
+enum NODE_TYPE node_type = fsr;
+uint8_t node_num = 0x31;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
+uint16_t moving_average(uint16_t);
 void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
-void send_number12(UART_HandleTypeDef*, uint16_t, uint32_t);
+
 /* Private function prototypes -----------------------------------------------*/
 
 /* USER CODE END PFP */
@@ -123,12 +128,15 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-		HAL_ADC_Start(&hadc);
-		HAL_ADC_PollForConversion(&hadc, 200);
-		ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
-		HAL_ADC_Stop(&hadc);
-		data[1] = ConvValue;
-		data[0] = ConvValue >> 8;
+		for(uint8_t i=0 ; i < 250 ; i++)
+		{
+			HAL_ADC_Start(&hadc);
+			HAL_ADC_PollForConversion(&hadc, 200);
+			ConvValue = (uint16_t)HAL_ADC_GetValue(&hadc);
+			HAL_ADC_Stop(&hadc);
+			filteredValue = moving_average(ConvValue);
+		}
+		frame_generator(data, sizeof(data), node_type, node_num, filteredValue);
 		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_RESET);
 		HAL_Delay(500);
 		if(transmit_rq(frame_ptr, data, sizeof(data), &huart2) != HAL_OK)
@@ -136,7 +144,7 @@ int main(void)
 			Error_Handler();
 		}
 		HAL_GPIO_WritePin(SLEEP_RQ_GPIO_Port, SLEEP_RQ_Pin, GPIO_PIN_SET);
-		HAL_Delay(8000);
+		HAL_Delay(2000);
   }
   /* USER CODE END 3 */
 
@@ -193,25 +201,25 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 /**
-  * @brief  This function converts integer to printable string
-	* @param  UARTx : pointer to UART handle typedef
-	*	@paran	num_value : integer value which is to be converted
-	* @param 	timout : timout value needed for sending over UART
+  * @brief  This function filters data
+	* @param  sensor_value : input raw sensor data
   * @retval None
   */
-void send_number12(UART_HandleTypeDef* UARTx, uint16_t num_value, uint32_t timeout)
+uint16_t moving_average(uint16_t sensor_value)
 {
-	uint8_t buffer[4] = "0000";
-	int i=0;
-	
-	do
-	{
-		buffer[3 - i++] = (uint8_t)(num_value % 10) + 48;
-		num_value /= 10;
-	}
-	while(num_value);
-	
-	HAL_UART_Transmit(UARTx, buffer, sizeof(buffer), timeout);
+  static float history[filterWindowLength];
+	float filtered_value = 0;
+  
+  for(uint8_t i=1 ; i < filterWindowLength ; i++){
+    history[i-1] = history[i];
+		filtered_value += history[i-1];
+  }
+  
+  history[filterWindowLength - 1] = sensor_value; 
+  filteredValue += sensor_value;
+  filtered_value /= (float)filterWindowLength;
+
+  return (uint16_t)filtered_value;
 }
 
 /* USER CODE END 4 */

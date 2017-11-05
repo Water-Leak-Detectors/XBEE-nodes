@@ -86,3 +86,39 @@ HAL_StatusTypeDef transmit_rq(transmit_frame* trans_rq, uint8_t* data, uint16_t 
 	status = HAL_UART_Transmit(UARTx, out_stream, sizeof(out_stream), 250);
 	return status;
 }
+/**
+  * @brief  This function creates user's specific data frame
+	* @param  frame: pointer to xbee frame
+	*	@param	trans_rq: pointer to trans-RQ specific frame
+	* @param 	size: size of sending data
+  * @retval UART status
+  */	
+void frame_generator(uint8_t* data_ptr, uint16_t size, enum NODE_TYPE node_type, uint8_t node_num, uint16_t raw_value)
+{
+	uint8_t end_byte = 0x2E;
+	uint8_t seperator = 0x2C;
+	uint8_t node_id;
+	/* Determine what to put in node_id*/
+	switch(node_type)
+	{
+		case fsr:
+			node_id = 0x66;
+			break;
+		case pressure:
+			node_id = 0x70;
+			break;
+		case flow:
+			node_id = 0x76;
+			break;
+		default:
+			break;
+	}
+	/* Filling data field of packet*/
+	data_ptr[0] = node_id;
+	data_ptr[1] = node_num;
+	data_ptr[2] = seperator;
+	data_ptr[3] = raw_value >> 8;
+	data_ptr[4] = raw_value;
+	data_ptr[5] = end_byte;
+	
+}

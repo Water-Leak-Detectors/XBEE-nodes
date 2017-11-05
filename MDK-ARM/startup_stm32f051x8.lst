@@ -397,7 +397,7 @@ ARM Macro Assembler    Page 7
               00000000 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M0 --apcs=interw
 ork --depend=xbee-nodes-prj\startup_stm32f051x8.d -oxbee-nodes-prj\startup_stm3
-2f051x8.o -I.\RTE\_XBEE-Nodes-Prj -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\I
+2f051x8.o -I.\RTE\_XBEE-Nodes-Prj -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.1.1\CMSIS\I
 nclude -IC:\Keil_v5\ARM\PACK\Keil\STM32F0xx_DFP\1.5.0\Device\Include --predefin
 e="__MICROLIB SETA 1" --predefine="__UVISION_VERSION SETA 523" --predefine="_RT
 E_ SETA 1" --predefine="STM32F051x8 SETA 1" --list=startup_stm32f051x8.lst star
